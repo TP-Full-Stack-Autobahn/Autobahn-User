@@ -9,12 +9,13 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/api/admin', name: 'admin_api')]
 class AdminApiController extends AbstractController
 {
-    #[Route('/', name: 'app_admin_api')]
+    #[Route('/', name: 'get_admin')]
     public function index(): JsonResponse
     {
+        $user = $this->getUser();
         return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/AdminApiController.php',
+            'user' => $user->getUserIdentifier(),
+            'roles' => $user->getRoles()
         ]);
     }
 }
