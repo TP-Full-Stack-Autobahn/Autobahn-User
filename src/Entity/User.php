@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -14,12 +15,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['user', 'onValid'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Groups(['user', 'onValid'])]
     private ?string $email = null;
 
     #[ORM\Column]
+    #[Groups(['user'])]
     private array $roles = [];
 
     /**
@@ -27,6 +31,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
+    #[Groups(['user', 'onValid'])]
+    private ?FutureUser $futureUser = null;
 
     public function getId(): ?int
     {
@@ -96,5 +104,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function getFutureUser(): ?FutureUser
+    {
+        return $this->futureUser;
+    }
+
+    public function setFutureUser(?FutureUser $futureUser): self
+    {
+        // unset the owning side of the relation if necessary
+        if ($futureUser === null && $this->futureUser !== null) {
+            $this->futureUser->setUser(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($futureUser !== null && $futureUser->getUser() !== $this) {
+            $futureUser->setUser($this);
+        }
+
+        $this->futureUser = $futureUser;
+
+        return $this;
     }
 }

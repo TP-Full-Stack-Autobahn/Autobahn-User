@@ -2,16 +2,19 @@
 
 namespace App\Controller;
 
+use App\Repository\FutureUserRepository;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
-#[Route('/api/user', name: 'user_api')]
+#[Route('/api/user', name: 'user_api.')]
 class UserApiController extends AbstractController
 {
-    #[Route('/', name: 'get_user', methods: "GET")]
+    #[Route(name: 'get_user', methods: "GET")]
     public function index(): JsonResponse
     {
         $user = $this->getUser();
@@ -21,8 +24,25 @@ class UserApiController extends AbstractController
         ]);
     }
 
+    #[Route('/users', name: 'get_users', methods: "GET")]
+    public function getUsers(UserRepository $userRepository): JsonResponse
+    {
+        $users = $userRepository->findAll();
+
+        return $this->json(['users' => $users], Response::HTTP_OK, [], ['groups' => 'user']);
+    }
+
+    #[Route('/future-users', name: 'get_future_users', methods: "GET")]
+    public function getFutureUsers(FutureUserRepository $futureUserRepository): JsonResponse
+    {
+        $futureUsers = $futureUserRepository->findBy(['validated' => false]);
+
+        return $this->json(['users' => $futureUsers], Response::HTTP_OK, [], ['groups' => 'futureUser']);
+    }
+
+
     #[Route('/checkrole', name: 'check_role', methods: 'POST')]
-    public function checkRole(Request $request)
+    public function checkRole(Request $request): JsonResponse
     {
         $user = $this->getUser();
         $data = json_decode($request->getContent(), true);
