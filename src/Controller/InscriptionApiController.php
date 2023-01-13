@@ -44,12 +44,12 @@ class InscriptionApiController extends AbstractController
     }
 
     #[Route('/valid-user/{id}', name: 'valid-user', methods: 'POST')]
-    public function validUser(Request $request, int $id, FutureUserRepository $futureUserRepository,
+    public function validUser(Request $request, FutureUserRepository $futureUserRepository,
                               EntityManagerInterface $entityManager, SerializerInterface $serializer,
-                              UserPasswordHasherInterface $hasher): JsonResponse
+                              UserPasswordHasherInterface $hasher, FutureUser $futureUser): JsonResponse
     {
-        $futureUser = $futureUserRepository->find($id);
-        if ($futureUser) {
+       // $futureUser = $futureUserRepository->find($id);
+     //   if ($futureUser) {
             if (!$futureUser->isValidated()) {
                 $futureUser->setValidated(true);
 
@@ -68,7 +68,7 @@ class InscriptionApiController extends AbstractController
                 return $this->json($user, Response::HTTP_OK);
             }
             return $this->json(['message' => 'User already validated'], Response::HTTP_CONFLICT);
-        }
-        return $this->json(['message' => 'User ['.$id.'] not found'], Response::HTTP_NOT_FOUND);
+      //  }
+      //  return $this->json(['message' => 'User ['.$id.'] not found'], Response::HTTP_NOT_FOUND);
     }
 }
