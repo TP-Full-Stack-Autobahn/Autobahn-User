@@ -22,27 +22,10 @@ class InscriptionApiController extends AbstractController
     public function inscription(Request $request, ValidatorInterface $validator,
                                 EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-
-        $keys = ['email', 'firstname', 'lastname', 'phone', 'nationality'];
-        foreach ($keys as $key) {
-            $hasKey = array_key_exists($key, $data);
-            if (!$hasKey) {
-                return $this->json(['message' => $key.' is missing'], Response::HTTP_BAD_REQUEST);
-            }
-        }
-
-        $futureUser = new FutureUser();
-        $futureUser
-            ->setEmail($data['email'])
-            ->setFirstname($data['firstname'])
-            ->setLastname($data['lastname'])
-            ->setPhone($data['phone'])
-            ->setNationality($data['nationality'])
-            ->setValidated(false);
+        $futureUser = $serializer->deserialize($request->getContent(), FutureUser::class, 'json');
+        $futureUser->setValidated(false);
 
         $errors = $validator->validate($futureUser);
-
 
         if (count($errors)) {
             $violations = [];
@@ -55,7 +38,7 @@ class InscriptionApiController extends AbstractController
         $entityManager->persist($futureUser);
         $entityManager->flush();
 
-        $futureUser = $serializer->serialize($futureUser, 'json');
+        $futureUser = $serializer->serialize($futureUser, 'json', ['groups' => ['onSignUp']]);
 
         return $this->json($futureUser, Response::HTTP_OK);
     }

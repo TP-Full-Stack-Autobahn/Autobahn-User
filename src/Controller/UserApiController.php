@@ -9,7 +9,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route('/api/user', name: 'user_api.')]
 class UserApiController extends AbstractController
@@ -19,7 +18,8 @@ class UserApiController extends AbstractController
     {
         $user = $this->getUser();
         return $this->json([
-            'user' => $user->getUserIdentifier(),
+            'email' => $user->getEmail(),
+            'isAdmin' => in_array('ROLE_ADMIN', $user->getRoles()),
             'roles' => $user->getRoles()
         ]);
     }
@@ -35,7 +35,7 @@ class UserApiController extends AbstractController
     #[Route('/future-users', name: 'get_future_users', methods: "GET")]
     public function getFutureUsers(FutureUserRepository $futureUserRepository): JsonResponse
     {
-        $futureUsers = $futureUserRepository->findBy(['validated' => false]);
+        $futureUsers = $futureUserRepository->findAll();
 
         return $this->json(['users' => $futureUsers], Response::HTTP_OK, [], ['groups' => 'futureUser']);
     }

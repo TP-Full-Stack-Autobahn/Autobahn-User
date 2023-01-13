@@ -20,23 +20,28 @@ class FutureUser
 
     #[ORM\Column(length: 255, unique: true)]
     #[Assert\Email]
-    #[Groups(['futureUser'])]
+    #[Groups(['futureUser', 'onSignUp'])]
+    #[Assert\NotNull]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['user', 'onValid', 'futureUser'])]
+    #[Assert\NotNull]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['user', 'onValid', 'futureUser'])]
+    #[Assert\NotNull]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['user', 'onValid', 'futureUser'])]
+    #[Assert\NotNull]
     private ?string $phone = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['user', 'onValid', 'futureUser'])]
+    #[Assert\NotNull]
     private ?string $nationality = null;
 
     #[ORM\Column]
@@ -45,6 +50,11 @@ class FutureUser
 
     #[ORM\OneToOne(inversedBy: 'futureUser', cascade: ['persist', 'remove'])]
     private ?User $user = null;
+
+    #[ORM\Column(length: 255)]
+    #[Assert\Choice(['company', 'individual'])]
+    #[Assert\NotNull]
+    private ?string $client = null;
 
     public function getId(): ?int
     {
@@ -131,6 +141,18 @@ class FutureUser
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getClient(): ?string
+    {
+        return $this->client;
+    }
+
+    public function setClient(string $client): self
+    {
+        $this->client = $client;
 
         return $this;
     }

@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -20,20 +21,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 180, unique: true)]
     #[Groups(['user', 'onValid'])]
+    #[Assert\NotNull]
     private ?string $email = null;
 
     #[ORM\Column]
     #[Groups(['user'])]
+    #[Assert\NotNull]
     private array $roles = [];
 
     /**
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Assert\NotNull]
     private ?string $password = null;
 
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     #[Groups(['user', 'onValid'])]
+    #[Assert\NotNull]
     private ?FutureUser $futureUser = null;
 
     public function getId(): ?int

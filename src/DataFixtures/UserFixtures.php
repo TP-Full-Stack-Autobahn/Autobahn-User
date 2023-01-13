@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\FutureUser;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -28,18 +29,19 @@ class UserFixtures extends Fixture
                 )
             )
             ->setRoles(['ROLE_ADMIN']);
-         $manager->persist($user);
 
-        $user = new User();
-        $user
-            ->setEmail("user@gmail.com")
-            ->setPassword(
-                $this->hasher->hashPassword(
-                    $user,
-                    "user"
-                )
-            )
-            ->setRoles(['ROLE_USER']);
+        $futureUser = new FutureUser();
+        $futureUser
+            ->setEmail("admin@gmail.com")
+            ->setNationality("french")
+            ->setPhone("0641221535")
+            ->setLastname("HOCHET")
+            ->setFirstname("Dylan")
+            ->setClient("company")
+            ->setValidated(true)
+            ->setUser($user);
+
+        $manager->persist($futureUser);
         $manager->persist($user);
 
         $manager->flush();
