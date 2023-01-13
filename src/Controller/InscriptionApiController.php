@@ -48,27 +48,23 @@ class InscriptionApiController extends AbstractController
                               EntityManagerInterface $entityManager, SerializerInterface $serializer,
                               UserPasswordHasherInterface $hasher, FutureUser $futureUser): JsonResponse
     {
-       // $futureUser = $futureUserRepository->find($id);
-     //   if ($futureUser) {
-            if (!$futureUser->isValidated()) {
-                $futureUser->setValidated(true);
+        if (!$futureUser->isValidated()) {
+            $futureUser->setValidated(true);
 
-                $user = new User();
-                $user
-                    ->setEmail($futureUser->getEmail())
-                    ->setPassword($hasher->hashPassword($user, $futureUser->getEmail()))
-                    ->setRoles(['ROLE_USER'])
-                    ->setFutureUser($futureUser);
+            $user = new User();
+            $user
+                ->setEmail($futureUser->getEmail())
+                ->setPassword($hasher->hashPassword($user, $futureUser->getEmail()))
+                ->setRoles(['ROLE_USER'])
+                ->setFutureUser($futureUser);
 
-                $entityManager->persist($user);
-                $entityManager->flush();
+            $entityManager->persist($user);
+            $entityManager->flush();
 
-                $user = $serializer->serialize($user, 'json', ['groups' => ['onValid']]);
+            $user = $serializer->serialize($user, 'json', ['groups' => ['onValid']]);
 
-                return $this->json($user, Response::HTTP_OK);
-            }
-            return $this->json(['message' => 'User already validated'], Response::HTTP_CONFLICT);
-      //  }
-      //  return $this->json(['message' => 'User ['.$id.'] not found'], Response::HTTP_NOT_FOUND);
+            return $this->json($user, Response::HTTP_OK);
+        }
+        return $this->json(['message' => 'User already validated'], Response::HTTP_CONFLICT);
     }
 }
